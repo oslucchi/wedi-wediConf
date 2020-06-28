@@ -1,6 +1,7 @@
 package it.l_soft.wediConf.rest.trays;
 
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -30,16 +31,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.apache.log4j.Logger;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import it.l_soft.wediConf.rest.ApplicationProperties;
@@ -550,41 +544,60 @@ public class TraysHandler {
 				"Dimensioni",
 				"Prezzo"
 		};
+        
 		int rowCount = 0;
+		int columnCount = 0;
 
-		row = sheet.createRow(++rowCount);
-		for (String header : headers)
+		row = sheet.createRow(rowCount++);
+		for (int i = 0; i < headers.length; i++)
 		{
-			int columnCount = 0;
-			cell = row.createCell(++columnCount);
-			cell.setCellValue(header);
+			cell = row.createCell(i);
+			cell.setCellValue(headers[i]);
 		}
 
 		for(int i = 0; i < jsonIn.asJsonArray().size(); i++)
 		{
-			int columnCount = 0;
+			columnCount = 0;
 			JsonObject item = jsonIn.getJsonObject(i); 
-			row = sheet.createRow(++rowCount);
-			cell = row.createCell(++columnCount);
+			row = sheet.createRow(rowCount++);
+			cell = row.createCell(columnCount++);
 			cell.setCellValue(item.getString("articleNumber"));
-			cell = row.createCell(++columnCount);
+			cell = row.createCell(columnCount++);
 			cell.setCellValue(item.getString("description"));
-			cell = row.createCell(++columnCount);
+			cell = row.createCell(columnCount++);
 			cell.setCellValue(item.getString("size"));
-			cell = row.createCell(++columnCount);
+			cell = row.createCell(columnCount++);
 			cell.setCellValue(item.getJsonNumber("price").doubleValue());             
 		}
 
-		String filePath = context.getRealPath("/") + "/spool/orders/" + token + ".xlsx";
-		FileOutputStream outputStream = new FileOutputStream(filePath);
+		columnCount = 0;
+		for (int i = 0; i < headers.length; i++)
+		{
+			sheet.autoSizeColumn(columnCount++);
+		}
+
+        ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
+        byte[] byteRpt = null;
+                  
+        workbook.write(excelOutput);
+        byteRpt = excelOutput.toByteArray();
+		excelOutput.close();
+//        byte[] encodedBytes = Base64.encodeBase64(byteRpt);
+//        String base64 = new String(encodedBytes);
+        ResponseBuilder response = Response.ok((Object) byteRpt);
+
+        String filePath = context.getRealPath("/") + "/spool/orders/" + token + ".xlsx";
+        FileOutputStream outputStream = new FileOutputStream(filePath);
 		workbook.write(outputStream);
-		workbook.close();
 		outputStream.close();
+		workbook.close();
+//        File fileDownload = new File(filePath);
+//        ResponseBuilder response = Response.ok((Object) fileDownload);
 		
-        File fileDownload = new File(filePath);
-        ResponseBuilder response = Response.ok((Object) fileDownload);
         response.header("Content-type", "application/vnd.ms-excel");
         response.header("Content-Disposition", "attachment; filename=" + filePath);
+        
+
         return response.build();
     }
 
