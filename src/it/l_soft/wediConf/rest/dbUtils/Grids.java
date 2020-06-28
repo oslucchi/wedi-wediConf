@@ -17,6 +17,7 @@ public class Grids extends DBInterface
 	protected int width;
 	protected double thickness;
 	protected double price;
+	protected boolean combinable = false;
 	protected boolean selected = false;
 	
 	private void setNames()
@@ -126,6 +127,12 @@ public class Grids extends DBInterface
 	public void setSelected(boolean selected) {
 		this.selected = selected;
 	}
-	
-	
+
+	public boolean isCombinable() {
+		return combinable;
+	}
+
+	public void setCombinable(boolean combinable) {
+		this.combinable = combinable;
+	}	
 }

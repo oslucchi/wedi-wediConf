@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+  <display-name>wedi-wediConf</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>default.html</welcome-file>
+  </welcome-file-list>
+  <resource-ref>
+    <description>DB Connection</description>
+    <res-ref-name>jdbc/wediConf</res-ref-name>
+    <res-type>javax.sql.DataSource</res-type>
+    <res-auth>Container</res-auth>
+  </resource-ref>
+  <filter>
+    <filter-name>CORS</filter-name>
+    <filter-class>it.l_soft.wediConf.rest.CORSFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>CORS</filter-name>
+    <url-pattern>/restcall/*</url-pattern>
+  </filter-mapping>
+  <servlet>
+    <servlet-name>wediConf</servlet-name>
+    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+    <init-param>
+      <param-name>jersey.config.server.provider.packages</param-name>
+      <param-value>it.l_soft.wediConf.rest</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>wediConf</servlet-name>
+    <url-pattern>/restcall/*</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>CORSFilter</servlet-name>
+    <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+    <init-param>
+      <param-name>com.sun.jersey.config.property.packages</param-name>
+      <param-value>it.l_soft.wediConf.rest</param-value>
+    </init-param>
+    <init-param>
+      <param-name>javax.ws.rs.container.ContainerRequestFilter</param-name>
+      <param-value>it.l_soft.wediConf.rest.CORSFilter</param-value>
+    </init-param>
+  </servlet>
+  <listener>
+    <listener-class>it.l_soft.wediConf.rest.WediConf</listener-class>
+  </listener>
+</web-app>
