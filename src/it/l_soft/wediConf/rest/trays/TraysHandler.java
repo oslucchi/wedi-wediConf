@@ -382,7 +382,7 @@ public class TraysHandler {
 					}
 					else
 					{
-						jBuild.add("LMin", String.valueOf(Integer.parseInt(checkJsonAttribute(jsonIn, "LMin")) - 600));
+//						jBuild.add("LMin", String.valueOf(Integer.parseInt(checkJsonAttribute(jsonIn, "LMin")) - 600));
 						jBuild.add("Length", String.valueOf(Integer.parseInt(checkJsonAttribute(jsonIn, "LMin")) - 600));
 						jBuild.add("draintype", "E");
 					}
