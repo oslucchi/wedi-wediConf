@@ -26,12 +26,15 @@ public class CORSFilter implements Filter {
 		log.debug("Request: " + request.getMethod() + " to " + request.getRequestURI());
 
 		HttpServletResponse resp = (HttpServletResponse) servletResponse;
-		resp.addHeader("Access-Control-Allow-Origin","*");
-		resp.addHeader("Access-Control-Allow-Methods","GET,POST,PUT,DELETE");
-		resp.addHeader("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept, Authorization, Language, Edit-Mode");
+		resp.addHeader("Access-Control-Allow-Origin", "*");
+		resp.addHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE");
+		resp.addHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization, Language, Edit-Mode");
 
 		// Just ACCEPT and REPLY OK if OPTIONS
 		if ( request.getMethod().equals("OPTIONS") ) {
+			log.debug("Option request, returning ok: " +
+					  "Allow-Origin" + resp.getHeader("Access-Control-Allow-Origin") + 
+					  "Allow-Methods" + resp.getHeader("Access-Control-Allow-Methods"));
 			resp.setStatus(HttpServletResponse.SC_OK);
 			return;
 		}

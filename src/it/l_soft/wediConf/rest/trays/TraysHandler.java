@@ -527,6 +527,7 @@ public class TraysHandler {
 		writer.close();
         File fileDownload = new File(filePath);
         ResponseBuilder response = Response.ok((Object) fileDownload);
+        response.header("Content-type", "text/plain");
         response.header("Content-Disposition", "attachment; filename=" + fileDownload.getName());
         return response.build();
 	}
@@ -629,7 +630,7 @@ public class TraysHandler {
 		writer.close();
         File fileDownload = new File(filePath);
         ResponseBuilder response = Response.ok((Object) fileDownload);
-        response.header("Content-type", "application/vnd.ms-excel");
+        response.header("Content-type", "text/csv");
         response.header("Content-Disposition", "attachment; filename=" + fileDownload.getName());
         return response.build();
 	}

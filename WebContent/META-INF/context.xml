@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context docBase="" path="wediConf" reloadable="true" source="org.eclipse.jst.jee.server:WediConf">
+<Context docBase="wediConf" path="" reloadable="true" source="org.eclipse.jst.jee.server:WediConf">
 	<Resources allowLinking="true" />
 	<Resource auth="Container" driverClassName="com.mysql.jdbc.Driver" 
 				maxTotal="10000" maxIdle="1000" 
 				removeAbandonedOnBorrow="true" removeAbandonedTimeout="60" logAbandoned="true"
 				username="wediconf" password="F220sclp@"
 				name="jdbc/wediConf" type="javax.sql.DataSource" 
-				url="jdbc:mysql://localhost:3306/wediconf?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=UTC"/>
+				url="jdbc:mysql://webAppDB.wedi.it:3306/wediconf?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=UTC"/>
 </Context>
