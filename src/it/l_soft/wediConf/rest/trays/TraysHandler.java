@@ -3,6 +3,7 @@ package it.l_soft.wediConf.rest.trays;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.StringReader;
@@ -10,6 +11,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -635,6 +638,64 @@ public class TraysHandler {
         return response.build();
 	}
 	
+	private Response generateOrderFileDOC(String token, JsonArray jsonIn) throws Exception
+	{
+		JsonObject item = jsonIn.getJsonObject(0); 
+        String zipFile = context.getRealPath("/") + "/spool/techDetails/" + token + ".zip";
+        String articleNumber = item.getString("articleNumber");
+
+        String[] srcFiles = {
+ 				"IstruzioniMontaggio.pdf",
+ 				"IstruzioniMontaggioScarico.pdf",
+ 				"IstruzioniCanalinaPiastrellabile.pdf",
+ 				"IstruzioniCanalina.pdf",
+ 				"DN40.pdf",
+ 				"DN50.pdf",
+				articleNumber + ".png",
+				articleNumber + ".pdf",
+			    articleNumber + ".dwg"
+		};
+         
+        // create byte buffer
+        byte[] buffer = new byte[1024];
+        FileOutputStream fos = new FileOutputStream(zipFile); 
+        ZipOutputStream zos = new ZipOutputStream(fos);
+        for (String srcFile : srcFiles) 
+        {
+        	srcFile = context.getRealPath("/") + "/assets/productDetails/" +
+        			  (item.getString("trayType").compareTo("P") == 0 ? "Primo" : "Riolito") + "/" + srcFile;
+        	FileInputStream fis = null;
+            try {
+            	fis = new FileInputStream(srcFile);
+            }
+            catch(Exception e)
+            {
+            	continue;
+            }
+            
+            // begin writing a new ZIP entry, positions the stream to the start of the entry data
+            File zipEntry = new File(srcFile);
+            zos.putNextEntry(new ZipEntry(zipEntry.getName()));
+            int length;
+            while ((length = fis.read(buffer)) > 0)
+            {
+                zos.write(buffer, 0, length);
+            }
+            zos.closeEntry();
+            // close the InputStream
+            fis.close();
+        }
+        // close the ZipOutputStream
+        zos.close();
+        fos.close();
+
+        File fileDownload = new File(zipFile);
+        ResponseBuilder response = Response.ok((Object) fileDownload);
+        response.header("Content-type", "application/zip");
+        response.header("Content-Disposition", "attachment; filename=" + fileDownload.getName());
+        return response.build();
+	}
+
 	@POST
 	@Path("/order/{type}")
     @Produces(MediaType.TEXT_PLAIN)
@@ -670,6 +731,9 @@ public class TraysHandler {
 				
 			case "exc":
 				return generateOrderFileEXC(token, jsonIn);
+				
+			case "doc":
+				return generateOrderFileDOC(token, jsonIn);
 				
 			default:
 				log.error("File type '" + type + "' is invalid");

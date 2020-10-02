@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>wediConf</groupId>
   <artifactId>wediConf</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>war</packaging>
   <name>wediConf</name>
   <description>wedi trays configurator server</description>
