@@ -31,18 +31,17 @@ public class JavaJSONMapper {
 		ObjectMapper mapper = new ObjectMapper();
 		try
 		{
-			//	    	  PrintWriter out = new PrintWriter("./tmpjson");
-			//	    	  out.println(jsonIn.toString());
-			//	    	  out.close();
-			//		         object =  mapper.readValue(new File("./tmpjson"), objectClass);
 			object =  mapper.readValue(jsonIn.toString(), objClass);
-		} catch (JsonGenerationException e)
+		} 
+		catch (JsonGenerationException e)
 		{
 			e.printStackTrace();
-		} catch (JsonMappingException e)
+		} 
+		catch (JsonMappingException e)
 		{
 			e.printStackTrace();
-		} catch (IOException e)
+		} 
+		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
