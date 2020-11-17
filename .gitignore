@@ -1,1 +1,13 @@
 /target/
+/docs/*
+!/docs/dbdump.sql
+/WebContent/assets/
+/WebContent/spool/
+/WebContent/WEB-INF/
+/WebContent/3rdpartylicenses.txt
+/WebContent/favicon.ico
+/WebContent/index.html
+/WebContent/poly*
+/WebContent/main*
+/WebContent/runtime*
+/WebContent/styles*
