@@ -382,6 +382,7 @@ public class TraysHandler {
 		JsonReader jsonReader = Json.createReader(new StringReader(body));
 		JsonObject jsonIn = jsonReader.readObject();
 		jsonReader.close();
+		JsonObject searchCriteria = null;
 
 		ArrayList<Trays> trays= null;
 		User user = null;
@@ -410,56 +411,57 @@ public class TraysHandler {
 				}		
 			}
 
-			String session = jsonIn.getString("session");
+			String session = jsonIn.getJsonObject("session").getString("sessionId");
 			JournalSearches js = new JournalSearches();
 			js.setSession(session);
 			js.setTimestamp(new Date());
 			js.setSearchCriteria(jsonIn.getJsonObject("searchCriteria").toString());
 			js.insert(conn, "idJournalSearches", js);
 
+			searchCriteria = jsonIn.getJsonObject("searchCriteria");
 			log.trace("Getting trays from DB");
-			trays = Trays.findArticles(conn, traysGetWhereClause(jsonIn.getJsonObject("searchCriteria")), 
+			trays = Trays.findArticles(conn, traysGetWhereClause(searchCriteria), 
 					Constants.getLanguageCode(language));
 			if ((trays == null) || (trays.size() == 0))
 			{
 				useExtension = true;
 				log.trace("No record on these conditions '" +
-						checkJsonAttribute(jsonIn, "trayType") + "' - " +
-						checkJsonAttribute(jsonIn, "wMin") + "' - " +
-						checkJsonAttribute(jsonIn, "lMin"));
+						checkJsonAttribute(searchCriteria, "trayType") + "' - " +
+						checkJsonAttribute(searchCriteria, "wMin") + "' - " +
+						checkJsonAttribute(searchCriteria, "lMin"));
 				log.trace("softening constraints using prolongues");
 
 				JsonObjectBuilder jBuild = Json.createObjectBuilder();
-				jBuild.add("trayType", checkJsonAttribute(jsonIn, "trayType"));
-				jBuild.add("screedThickness", checkJsonAttribute(jsonIn.getJsonObject("searchCriteria"), "screedThickness"));
+				jBuild.add("trayType", checkJsonAttribute(searchCriteria, "trayType"));
+				jBuild.add("screedThickness", checkJsonAttribute(searchCriteria, "screedThickness"));
 
-				if (checkJsonAttribute(jsonIn, "trayType").compareTo("L") == 0)
+				if (checkJsonAttribute(searchCriteria, "trayType").compareTo("L") == 0)
 				{
-					jBuild.add("wMin", checkJsonAttribute(jsonIn, "wMin"));
-					jBuild.add("width", checkJsonAttribute(jsonIn, "wMin"));
-					if (Integer.parseInt(checkJsonAttribute(jsonIn, "lMin")) < 90)
+					jBuild.add("wMin", checkJsonAttribute(searchCriteria, "wMin"));
+					jBuild.add("width", checkJsonAttribute(searchCriteria, "wMin"));
+					if (Double.parseDouble(checkJsonAttribute(searchCriteria, "lMin")) < 90)
 					{
-						jBuild.add("lMin", String.valueOf(Integer.parseInt(checkJsonAttribute(jsonIn, "lMin"))));
-						jBuild.add("length", String.valueOf(Integer.parseInt(checkJsonAttribute(jsonIn, "lMin"))));
+						jBuild.add("lMin", String.valueOf(Double.parseDouble(checkJsonAttribute(searchCriteria, "lMin"))));
+						jBuild.add("length", String.valueOf(Double.parseDouble(checkJsonAttribute(searchCriteria, "lMin"))));
 					}
 					else
 					{
-						jBuild.add("length", String.valueOf(Integer.parseInt(checkJsonAttribute(jsonIn, "lMin")) - 600));
+						jBuild.add("length", String.valueOf(Double.parseDouble(checkJsonAttribute(searchCriteria, "lMin")) - 600));
 					}
 				}
 				else
 				{
-					jBuild.add("width", String.valueOf(Integer.parseInt(checkJsonAttribute(jsonIn, "wMin")) - 1200));					
-					jBuild.add("length", String.valueOf(Integer.parseInt(checkJsonAttribute(jsonIn, "lMin")) - 1200));					
+					jBuild.add("width", String.valueOf(Double.parseDouble(checkJsonAttribute(searchCriteria, "wMin")) - 1200));					
+					jBuild.add("length", String.valueOf(Double.parseDouble(checkJsonAttribute(searchCriteria, "lMin")) - 1200));					
 				}
 				JsonObject newJson = jBuild.build();				
 				trays = Trays.findArticles(conn, traysGetWhereClause(newJson), 
 						Constants.getLanguageCode(language));
 
-				if (checkJsonAttribute(jsonIn, "trayType").compareTo("P") == 0)
+				if (checkJsonAttribute(searchCriteria, "trayType").compareTo("P") == 0)
 				{
-					double sidesRatio = ((double)Integer.parseInt(checkJsonAttribute(jsonIn, "wMin"))) / 
-							Integer.parseInt(checkJsonAttribute(jsonIn, "lMin"));
+					double sidesRatio = ((double)Integer.parseInt(checkJsonAttribute(searchCriteria, "wMin"))) / 
+							Integer.parseInt(checkJsonAttribute(searchCriteria, "lMin"));
 					ArrayList<Trays> toDelete = new ArrayList<Trays>();
 					for(Trays tray : trays)
 					{
@@ -825,7 +827,7 @@ public class TraysHandler {
 			jp = new JournalProposals();
 			jp.setOrderObject(orderList.toString());
 			jp.setReference(jsonIn.getString("reference"));
-			jp.setSession(jsonIn.getString("session"));
+			jp.setSession(jsonIn.getJsonObject("session").getString("sessionId"));
 			jp.insert(conn, "idJournalProposals", jp);
 			DBInterface.disconnect(conn);
 			

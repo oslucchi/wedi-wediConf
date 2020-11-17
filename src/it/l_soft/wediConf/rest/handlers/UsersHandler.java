@@ -65,12 +65,13 @@ public class UsersHandler {
 			log.trace("Getting the user");
 			user = User.getUserByToken(conn, user.getToken());
 
-			js = JournalSessions.getBySessionId(conn, jsonIn.getString("session"));
+			js = JournalSessions.getBySessionId(conn, jsonIn.getJsonObject("session").getString("sessionId"));
 			if (js.getIdJournalSessions() == 0)
 			{
 				js.setTimestamp(new Date());
 				js.setIdUser(user.getIdUser());
-				js.setSession(UUID.randomUUID().toString());
+				js.setSessionId(UUID.randomUUID().toString());
+				js.setIpAddress(jsonIn.getJsonObject("session").getString("ipAddress"));
 				js.insert(conn, "idJournalSessions", js);
 			}
 			DBInterface.disconnect(conn);
@@ -83,7 +84,7 @@ public class UsersHandler {
 
 		HashMap<String, Object> jsonResponse = new HashMap<>();
 		jsonResponse.put("user", user);
-		jsonResponse.put("session", js.getSession());
+		jsonResponse.put("session", js);
 		
 		JsonHandler jh = new JsonHandler();
 		if (jh.jasonize(jsonResponse, language) != Response.Status.OK)
@@ -119,9 +120,10 @@ public class UsersHandler {
 				"    <div style='font-family: Courier;'>" + 
 				"	    <p>" + 
 				"	        <span>" + 
-				"		        Cliccare su questo link per attivare la funzione di scarico dei documenti dal configuratore wedi" + 
+				"		        Cliccare su " +
+				"				<a href='http://it-configurator.wedi.eu/wediConf/restcall/user/confirm/" + user.getToken() + "'> questo link </a>" +
+				"               per attivare la funzione di scarico dei documenti dal configuratore wedi" + 
 				"		        </br>" + 
-				"				<a>http://it-configurator.wedi.eu/wediConfTest/restcall/user/confirm/" + user.getToken() + "</a>" +
 				"	        </span>" + 
 				"	    </p>" + 
 				"	    <span>" + 
@@ -165,8 +167,9 @@ public class UsersHandler {
 		{
 			conn = DBInterface.connect();
 			//Getting the user who made the request. If the token does not exists, register it to noUser.
-			log.trace("Getting the user");
+			log.trace("Getting the user by token " + token);
 			user = User.getUserByToken(conn, token);
+			log.trace("returned user token " + user.getToken());
 			user.setActive(true);
 			user.update(conn, "idUser");
 			DBInterface.disconnect(conn);

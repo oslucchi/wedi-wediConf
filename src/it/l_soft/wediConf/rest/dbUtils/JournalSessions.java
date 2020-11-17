@@ -10,7 +10,8 @@ public class JournalSessions extends DBInterface
 	protected int idJournalSessions = 0;
 	protected int idUser = 0;
 	protected Date timestamp = null;
-	protected String session= "";
+	protected String sessionId = "";
+	protected String ipAddress = "";
 
 	private void setNames()
 	{
@@ -42,14 +43,14 @@ public class JournalSessions extends DBInterface
 		if (sessionId.compareTo("") == 0)
 		{
 			JournalSessions js = new JournalSessions();
-			js.session = UUID.randomUUID().toString();
+			js.sessionId = UUID.randomUUID().toString();
 			return js;
 		}
 		else
 		{	
 			String sql = "SELECT * " +
 						 "FROM journalSessions " +
-						 "WHERE session = '" + sessionId + "'";
+						 "WHERE sessionId = '" + sessionId + "'";
 			return (JournalSessions) JournalSessions.populateByQuery(conn, sql, JournalSessions.class);
 		}
 	}
@@ -79,12 +80,20 @@ public class JournalSessions extends DBInterface
 		this.timestamp = timestamp;
 	}
 
-	public String getSession() {
-		return session;
+	public String getSessionId() {
+		return sessionId;
 	}
 
-	public void setSession(String session) {
-		this.session = session;
+	public void setSessionId(String sessionId) {
+		this.sessionId = sessionId;
+	}
+
+	public String getIpAddress() {
+		return ipAddress;
+	}
+
+	public void setIpAddress(String ipAddress) {
+		this.ipAddress = ipAddress;
 	}
 }
 

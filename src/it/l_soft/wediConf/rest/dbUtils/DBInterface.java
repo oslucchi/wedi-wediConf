@@ -521,11 +521,13 @@ public class DBInterface implements Serializable
 				populateObjectAttributesFromRecordset(objInst, conn.getRsm(), conn.getRs());
 				return objInst;
 			}
+			log.trace("no record available on getRx().next()");
 		}
 		catch(Exception e) 
 		{
     		retVal = "Error '" + e.getMessage() + "' retrieving fields from class '" + 
 					  objClass.getName() + "'" + ". StackTrace:" + Utils.printStackTrace(e);
+    		log.error(retVal, e);
 			throw new Exception(retVal);
 		}
 		finally
