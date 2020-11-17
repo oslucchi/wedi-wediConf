@@ -395,11 +395,14 @@ public class TraysHandler {
 			String token = jsonIn.getJsonObject("user").getString("token");
 			user = User.getUserByToken(conn, token);
 
-			if (user.getEmail().compareTo(jsonIn.getJsonObject("user").getString("email")) != 0)
+			if ((user.getEmail() != null) &&
+				(jsonIn.getJsonObject("user").getString("email").compareTo("") != 0) &&
+				(user.getEmail().compareTo(jsonIn.getJsonObject("user").getString("email")) != 0))
 			{
+				// Replace user data with the one in the POST body
 				user.setEmail(jsonIn.getJsonObject("user").getString("email"));
-				user.setFirstName(jsonIn.getJsonObject("user").getString("firstname"));
-				user.setLastName(jsonIn.getJsonObject("user").getString("lastname"));
+				user.setFirstName(jsonIn.getJsonObject("user").getString("firstName"));
+				user.setLastName(jsonIn.getJsonObject("user").getString("lastName"));
 				user.setOrganization(jsonIn.getJsonObject("user").getString("organization"));
 				if (user.getIdUser() == 0)
 				{
@@ -648,49 +651,6 @@ public class TraysHandler {
 
 	private Response generateOrderFileEXC(String token, JsonArray orderList, String reference) throws Exception
 	{
-		//    	XSSFWorkbook workbook = new XSSFWorkbook();
-		//        Sheet sheet = workbook.createSheet("ordini");
-		//        Row row;
-		//        Cell cell;
-		//        
-		//        String[] headers = {
-		//				"Articolo",
-		//				"Descrizione",
-		//				"Dimensioni",
-		//				"Prezzo"
-		//		};
-		//        
-		//		int rowCount = 0;
-		//		int columnCount = 0;
-		//
-		//		row = sheet.createRow(rowCount++);
-		//		for (int i = 0; i < headers.length; i++)
-		//		{
-		//			cell = row.createCell(i);
-		//			cell.setCellValue(headers[i]);
-		//		}
-		//
-		//		for(int i = 0; i < jsonIn.asJsonArray().size(); i++)
-		//		{
-		//			columnCount = 0;
-		//			JsonObject item = jsonIn.getJsonObject(i); 
-		//			row = sheet.createRow(rowCount++);
-		//			cell = row.createCell(columnCount++);
-		//			cell.setCellValue(item.getString("articleNumber"));
-		//			cell = row.createCell(columnCount++);
-		//			cell.setCellValue(item.getString("description"));
-		//			cell = row.createCell(columnCount++);
-		//			cell.setCellValue(item.getString("size"));
-		//			cell = row.createCell(columnCount++);
-		//			cell.setCellValue(item.getJsonNumber("price").doubleValue());             
-		//		}
-		//
-		//		columnCount = 0;
-		//		for (int i = 0; i < headers.length; i++)
-		//		{
-		//			sheet.autoSizeColumn(columnCount++);
-		//		}
-
 		XSSFWorkbook workbook = createExcel(orderList);
 
 		ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();

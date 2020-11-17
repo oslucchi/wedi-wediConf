@@ -1,5 +1,7 @@
 package it.l_soft.wediConf.rest.handlers;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.StringReader;
 import java.util.Date;
 import java.util.HashMap;
@@ -113,33 +115,22 @@ public class UsersHandler {
 			conn = DBInterface.connect();
 			user = (User) JavaJSONMapper.JSONToJava(jsonIn.getJsonObject("user"), User.class);
 			user.update(conn, "idUser");
-			String mailBody = 
-				"<html>" + 
-				"<head></head>" + 
-				"<body>" + 
-				"    <div style='font-family: Courier;'>" + 
-				"	    <p>" + 
-				"	        <span>" + 
-				"		        Cliccare su " +
-				"				<a href='http://it-configurator.wedi.eu/wediConf/restcall/user/confirm/" + user.getToken() + "'> questo link </a>" +
-				"               per attivare la funzione di scarico dei documenti dal configuratore wedi" + 
-				"		        </br>" + 
-				"	        </span>" + 
-				"	    </p>" + 
-				"	    <span>" + 
-				"	        Cordiali saluti<br>" + 
-				"	        --<br>" + 
-				"	        Wedi Italia Srl<br>" + 
-				"	        via Vimercate 44<br>" + 
-				"	        20876 Ornago (MB)<br>" + 
-				"	        Thp: 039 245 9420" + 
-				"	    </span>" + 
-				"	</div>" + 
-				"	<br>" + 
-				"	<br>" + 
-				"	<b>Mail inviata automaticamente. Non rispondere a questa mail. L'indirizzo mittente non &egrave; presidiato.</b>" + 
-				"</body>" + 
-				"</html>";
+			
+			BufferedReader reader = new BufferedReader(new FileReader(prop.getContext().getRealPath("/resources/email.txt")));
+			StringBuilder stringBuilder = new StringBuilder();
+			String line = null;
+			String ls = System.getProperty("line.separator");
+			while ((line = reader.readLine()) != null) 
+			{
+				stringBuilder.append(line);
+				stringBuilder.append(ls);
+			}
+			// delete the last new line separator
+			stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+			reader.close();
+
+			String mailBody = stringBuilder.toString();
+			mailBody = mailBody.replaceAll("TOKEN", user.getToken());
 			
 			Mailer.sendMail(user.getEmail(), mailBody);
 		}

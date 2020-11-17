@@ -27,8 +27,8 @@ public class WediConf implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent arg0) 
 	{
 		log.trace("application started");
-		//		prop = ApplicationProperties.getInstance();
-//		log.debug("arg0 servlet context " + arg0.getServletContext());
-//		prop.setContext(arg0.getServletContext());
+		prop = ApplicationProperties.getInstance();
+		log.debug("arg0 servlet context " + arg0.getServletContext());
+		prop.setContext(arg0.getServletContext());
     }
 }
