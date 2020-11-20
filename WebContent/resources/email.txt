@@ -1,0 +1,26 @@
+<html>
+<head></head>
+<body>
+    <div style='font-family: Courier;'>
+	    <p>
+	        <span>
+		        Cliccare su
+				<a href='http://it-configurator.wedi.eu/wediConf/restcall/user/confirm/TOKEN'> questo link </a>
+                per attivare la funzione di scarico dei documenti dal configuratore wedi
+		        </br>
+	        </span>
+	    </p>
+	    <span>
+	        Cordiali saluti<br>
+	        --<br>
+	        Wedi Italia Srl<br>
+	        via Vimercate 44<br>
+	        20876 Ornago (MB)<br>
+	        Thp: 039 245 9420
+	    </span>
+	</div>
+	<br>
+	<br>
+	<b>Mail inviata automaticamente. Non rispondere a questa mail. L'indirizzo mittente non &egrave; presidiato.</b>
+</body>
+</html>";

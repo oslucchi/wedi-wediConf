@@ -216,13 +216,15 @@ public class TraysHandler {
 		profiles = null;
 
 		JsonObject jsonProfiles = jsonIn.getJsonObject("profiles");
+		double lMin = Double.parseDouble(checkJsonAttribute(jsonIn, "lMin"));
+		double wMin = Double.parseDouble(checkJsonAttribute(jsonIn, "wMin"));
 		try
 		{
-			if (jsonIn.getInt("lMin") <= 1200)
+			if (lMin <= 1200)
 			{
 				profileLength = 1200;
 			}
-			else if (jsonIn.getInt("lMin") <= 1600)
+			else if (lMin <= 1600)
 			{
 				profileLength = 1600;
 			}
@@ -231,12 +233,11 @@ public class TraysHandler {
 				profileLength = 1800;
 			}
 
-			if ((jsonIn.getInt("wMin") < 1000) ||
-					(jsonIn.getInt("wMin") > 1200))
+			if ((wMin < 1000) || (wMin > 1200))
 			{
 				profileTerminalLen = 1000;
 			}
-			else if (jsonIn.getInt("wMin") > 2000)
+			else if (wMin > 2000)
 			{
 				profileTerminalLen = 1200;
 			}
