@@ -65,6 +65,41 @@ public class User extends DBInterface
 		return user;
 	}
 
+	public static User getMostRecentUserByEmail(DBConnection conn, String email) throws Exception
+	{
+		User user = null;
+		String sql = "SELECT * " +
+					 "FROM users " +
+					 "WHERE email = '" + email + "' AND " +
+					 "      active = true " +
+					 "ORDER BY idUser DESC " +
+					 "LIMIT 1";
+		try
+		{
+			user = (User) User.populateByQuery(conn, sql, User.class);
+		}
+		catch(Exception e)
+		{
+			if (e.getMessage().compareTo("No record found") == 0)
+			{
+				sql = "SELECT * " +
+					  "FROM users " +
+					  "WHERE email = '" + email + "' " +
+					  "ORDER BY idUser DESC " +
+					  "LIMIT 1";
+				try
+				{
+					user = (User) User.populateByQuery(conn, sql, User.class);
+				}
+				catch(Exception e1)
+				{
+					log.debug("Email " + email + " not found.");
+				}
+			}
+		}
+		return user;
+	}
+
 	public int getIdUser() {
 		return idUser;
 	}

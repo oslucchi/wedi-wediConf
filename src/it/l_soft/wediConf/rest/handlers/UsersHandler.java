@@ -74,7 +74,7 @@ public class UsersHandler {
 				js.setIdUser(user.getIdUser());
 				js.setSessionId(UUID.randomUUID().toString());
 				js.setIpAddress(jsonIn.getJsonObject("session").getString("ipAddress"));
-				js.insert(conn, "idJournalSessions", js);
+				js.setIdJournalSessions(js.insertAndReturnId(conn, "idJournalSessions", js));
 			}
 			DBInterface.disconnect(conn);
 		}
@@ -180,6 +180,92 @@ public class UsersHandler {
 							   "</body></html>")
 					   .build();
 
+	}	
+	@GET
+	@Path("/email/{email}")
+	@Produces(MediaType.TEXT_HTML)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response getByEmail(@PathParam("email") String email, 
+								@HeaderParam("Language") String language)
+	{
+		DBConnection conn = null;
+		User user = null;
+		try 
+		{
+			conn = DBInterface.connect();
+			//Getting the user who made the request. If the token does not exists, register it to noUser.
+			log.trace("Getting the user by email '" + email + "'");
+			user = User.getMostRecentUserByEmail(conn, email);
+			if (user != null)
+			{
+				log.trace("found user " + user.getFirstName() + " " + user.getLastName());
+			}
+			DBInterface.disconnect(conn);
+		}
+		catch(Exception e)
+		{
+			log.error("Exception " + e.getMessage(), e);
+			
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+						   .entity("{ \"error\" : \"Impossibile trovare la mail richiesta\" }")
+						   .build();
+		}
+
+		HashMap<String, Object> jsonResponse = new HashMap<>();
+		jsonResponse.put("user", user);
+
+		JsonHandler jh = new JsonHandler();
+		if (jh.jasonize(jsonResponse, language) != Response.Status.OK)
+		{
+			return Response.status(Response.Status.UNAUTHORIZED)
+					.entity(jh.json).build();
+		}
+		return Response.status(Response.Status.OK).entity(jh.json).build();
+	}
+	
+	@POST
+	@Path("/revamp")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response userRevamp(String body, @HeaderParam("Language") String language)
+	{
+		int languageId = Utils.setLanguageId(language);
+
+		JsonReader jsonReader = Json.createReader(new StringReader(body));
+		JsonObject jsonIn = jsonReader.readObject();
+		jsonReader.close();
+		
+		User userOld = null;
+		User userNew = null;
+		JournalSessions currentSession = null;
+		try 
+		{
+			conn = DBInterface.connect();
+			userOld = (User) JavaJSONMapper.JSONToJava(jsonIn.getJsonObject("userOld"), User.class);
+			userNew = (User) JavaJSONMapper.JSONToJava(jsonIn.getJsonObject("userNew"), User.class);
+			currentSession = (JournalSessions) JavaJSONMapper.JSONToJava(jsonIn.getJsonObject("currentSession"), JournalSessions.class);
+			currentSession.setIdUser(userOld.getIdUser());
+			currentSession.update(conn, "idJournalSessions");
+
+			userNew.delete(conn, userNew.getIdUser());			
+		}
+		catch(Exception e)
+		{
+			DBInterface.disconnect(conn);
+			log.error("Exception '" + e.getMessage() + "' sending confirmation email", e);		
+			return Utils.jsonizeResponse(Response.Status.INTERNAL_SERVER_ERROR, e, languageId, "generic.execError");
+		}
+
+		HashMap<String, Object> jsonResponse = new HashMap<>();
+		jsonResponse.put("user", userOld);
+
+		JsonHandler jh = new JsonHandler();
+		if (jh.jasonize(jsonResponse, language) != Response.Status.OK)
+		{
+			return Response.status(Response.Status.UNAUTHORIZED)
+					.entity(jh.json).build();
+		}
+		return Response.status(Response.Status.OK).entity(jh.json).build();
 	}	
 
 }
