@@ -1,9 +1,13 @@
 package it.l_soft.wediConf.rest.dbUtils;
 
+import java.util.Date;
 import java.util.UUID;
 
 public class User extends DBInterface
 {
+	public static final int ROLE_USER = 1;
+	public static final int ROLE_ADMIN = 10;
+	
 	private static final long serialVersionUID = 5418709142850102984L;
 
 	protected int idUser = 0;
@@ -13,6 +17,8 @@ public class User extends DBInterface
 	protected String organization = "";
 	protected String token = "";
 	protected boolean active = false;
+	protected int role = 1;
+	protected Date connectedOn = new Date();
 	
 	private void setNames()
 	{
@@ -154,6 +160,22 @@ public class User extends DBInterface
 
 	public void setActive(boolean active) {
 		this.active = active;
+	}
+
+	public int getRole() {
+		return role;
+	}
+
+	public void setRole(int role) {
+		this.role = role;
+	}
+
+	public Date getConnectedOn() {
+		return connectedOn;
+	}
+
+	public void setConnectedOn(Date connectedOn) {
+		this.connectedOn = connectedOn;
 	}
 	
 }

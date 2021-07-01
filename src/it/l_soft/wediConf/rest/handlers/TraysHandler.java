@@ -719,6 +719,8 @@ public class TraysHandler {
 				"IstruzioniMontaggioScarico.pdf",
 				"IstruzioniCanalinaPiastrellabile.pdf",
 				"IstruzioniCanalina.pdf",
+				"IstruzioniPulizia.pdf",
+				"SchedaTecnica.pdf",
 				"DN40.pdf",
 				"DN50.pdf",
 				articleNumber + ".png",
@@ -732,11 +734,14 @@ public class TraysHandler {
 		ZipOutputStream zos = new ZipOutputStream(fos);
 		for (String srcFile : srcFiles) 
 		{
-			srcFile = context.getRealPath("/") + "/assets/productDetails/" +
-					(item.getString("trayType").compareTo("P") == 0 ? "Primo" : "Riolito") + "/" + srcFile;
+			String srcFilePath = context.getRealPath("/") + "/assets/productDetails/";
+			if (item.getString("drainType").compareTo("I") == 0)				
+				srcFilePath += (item.getString("trayType").compareTo("P") == 0 ? "Plano" : "PlanoLinea") + "/" + srcFile;
+			else
+				srcFilePath += (item.getString("trayType").compareTo("P") == 0 ? "Primo" : "Riolito") + "/" + srcFile;
 			FileInputStream fis = null;
 			try {
-				fis = new FileInputStream(srcFile);
+				fis = new FileInputStream(srcFilePath);
 			}
 			catch(Exception e)
 			{
@@ -744,7 +749,7 @@ public class TraysHandler {
 			}
 
 			// begin writing a new ZIP entry, positions the stream to the start of the entry data
-			File zipEntry = new File(srcFile);
+			File zipEntry = new File(srcFilePath);
 			zos.putNextEntry(new ZipEntry(zipEntry.getName()));
 			int length;
 			while ((length = fis.read(buffer)) > 0)
